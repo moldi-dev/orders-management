@@ -35,6 +35,20 @@ public class Client {
         this.address = address;
     }
 
+    @Override
+    public String toString() {
+        return "Client = {" +
+                "clientId=" + clientId +
+                ", username='" + username + '\'' +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", address='" + address + '\'' +
+                '}';
+    }
+
     public Long getClientId() {
         return clientId;
     }

@@ -1,8 +1,10 @@
 package com.moldidev.main;
 
+import dao.ClientDAO;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Client;
 
 import java.io.IOException;
 

@@ -9,7 +9,6 @@ public class Product {
     private String imageUrl;
     private Double price;
     private Integer stock;
-    private Timestamp createdAt;
 
     public Product() {
 
@@ -23,14 +22,25 @@ public class Product {
         this.stock = stock;
     }
 
-    public Product(Long productId, String name, String description, String imageUrl, Double price, Integer stock, Timestamp createdAt) {
+    public Product(Long productId, String name, String description, String imageUrl, Double price, Integer stock) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.imageUrl = imageUrl;
         this.price = price;
         this.stock = stock;
-        this.createdAt = createdAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Product = {" +
+                "productId=" + productId +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
+                ", price=" + price +
+                ", stock=" + stock +
+                '}';
     }
 
     public Long getProductId() {
@@ -57,10 +67,6 @@ public class Product {
         return stock;
     }
 
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
     public void setProductId(Long productId) {
         this.productId = productId;
     }
@@ -83,9 +89,5 @@ public class Product {
 
     public void setStock(Integer stock) {
         this.stock = stock;
-    }
-
-    public void setCreatedAt(Timestamp createdAt) {
-        this.createdAt = createdAt;
     }
 }
