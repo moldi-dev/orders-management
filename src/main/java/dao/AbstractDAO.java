@@ -24,10 +24,11 @@ public class AbstractDAO<T> {
     }
 
     public T findById(Long id) {
-        System.out.println(createFindByIdQuery(id));
+        String query = createFindByIdQuery(id);
+        System.out.println(query);
 
-        try (PreparedStatement statement = ConnectionFactory.getConnection().prepareStatement(createFindByIdQuery(id))) {
-            ResultSet resultSet = statement.executeQuery();
+        try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(query)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             return createObject(resultSet);
         }
@@ -40,9 +41,10 @@ public class AbstractDAO<T> {
     }
 
     public List<T> findAll() {
-        System.out.println(createFindAllQuery());
+        String query = createFindAllQuery();
+        System.out.println(query);
 
-        try (PreparedStatement statement = ConnectionFactory.getConnection().prepareStatement(createFindAllQuery())) {
+        try (PreparedStatement statement = ConnectionFactory.getConnection().prepareStatement(query)) {
             ResultSet resultSet = statement.executeQuery();
 
             return createObjects(resultSet);
@@ -56,9 +58,10 @@ public class AbstractDAO<T> {
     }
 
     public T insert(T entity) {
-        System.out.println(createInsertQuery(entity));
+        String query = createInsertQuery(entity);
+        System.out.println(query);
 
-        try (PreparedStatement statement = ConnectionFactory.getConnection().prepareStatement(createInsertQuery(entity), Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement statement = ConnectionFactory.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
             int affectedRows = statement.executeUpdate();
 
             if (affectedRows == 0) {

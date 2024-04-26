@@ -16,7 +16,7 @@ module com.moldidev.main {
 
     opens controller to javafx.fxml;
 
-    exports com.moldidev.main;
+    exports main;
     exports controller;
     exports connection;
     exports reflection;

@@ -1,7 +1,5 @@
 package model;
 
-import java.sql.Timestamp;
-
 public class Product {
     private Long productId;
     private String name;
