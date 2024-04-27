@@ -18,6 +18,14 @@ public class ProductService {
         return productDAO.findAll();
     }
 
+    public Product findProductById(Long productId) {
+        return productDAO.findById(productId);
+    }
+
+    public Product findProductByName(String name) {
+        return productDAO.findByName(name);
+    }
+
     public Product insertProduct(String name, String description, Double price, Integer stock) {
         Product productToInsert = new Product(name, description, price, stock);
         return productDAO.insert(productToInsert);
@@ -27,12 +35,16 @@ public class ProductService {
         return productDAO.updateById(productId, updatedProduct);
     }
 
-    public void deleteProductById(Long productId) {
-        productDAO.deleteById(productId);
+    public Product updateProductByName(String productName, Product updatedProduct) {
+        return productDAO.updateByName(productName, updatedProduct);
     }
 
-    public void deleteProductByName(String productName) {
-        productDAO.deleteByName(productName);
+    public int deleteProductById(Long productId) {
+        return productDAO.deleteById(productId);
+    }
+
+    public int deleteProductByName(String productName) {
+        return productDAO.deleteByName(productName);
     }
 
     public ObservableList<Product> convertProductListToObservableList(List<Product> productList) {

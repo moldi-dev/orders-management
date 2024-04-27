@@ -16,10 +16,12 @@ module com.moldidev.main {
 
     opens controller to javafx.fxml;
     opens model to javafx.base;
+    opens utility to javafx.base;
 
     exports main;
     exports controller;
     exports connection;
     exports reflection;
     exports dao;
+    exports utility;
 }

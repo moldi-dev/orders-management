@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.OrdersController">
+   <top>
+      <AnchorPane prefHeight="75.0" prefWidth="1280.0" style="-fx-background-color: #0598ff;" BorderPane.alignment="CENTER">
+         <children>
+            <Text fx:id="yourOrdersText" fill="WHITE" layoutX="118.0" layoutY="43.0" onMouseClicked="#onYourOrdersTextClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Your orders">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fx:id="productsText" fill="WHITE" layoutX="14.0" layoutY="43.0" onMouseClicked="#onProductsTextClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Products">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fx:id="signOutText" fill="WHITE" layoutX="1193.0" layoutY="43.0" onMouseClicked="#onSignOutTextClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign out">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <Text fx:id="adminPanelText" fill="WHITE" layoutX="1005.0" layoutY="43.0" onMouseClicked="#onAdminPanelTextClicked" strokeType="OUTSIDE" strokeWidth="0.0" text="Admin panel">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+         </children>
+      </AnchorPane>
+   </top>
+   <center>
+      <TableView fx:id="tableView" prefHeight="645.0" prefWidth="1167.0" BorderPane.alignment="CENTER">
+        <columns>
+          <TableColumn fx:id="productNameColumn" prefWidth="285.0" text="PRODUCT NAME" />
+            <TableColumn fx:id="productDescriptionColumn" prefWidth="282.0" text="PRODUCT DESCRIPTION" />
+            <TableColumn fx:id="productPriceColumn" prefWidth="134.0" text="PRODUCT PRICE" />
+            <TableColumn fx:id="productQuantityColumn" prefWidth="195.0" text="QUANTITY" />
+            <TableColumn fx:id="totalPriceColumn" prefWidth="157.0" text="TOTAL PRICE" />
+            <TableColumn fx:id="createdAtColumn" prefWidth="226.0" text="ORDERED AT" />
+        </columns>
+      </TableView>
+   </center>
+</BorderPane>

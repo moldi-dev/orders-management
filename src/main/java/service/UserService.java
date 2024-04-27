@@ -6,6 +6,8 @@ import javafx.scene.control.ButtonType;
 import model.User;
 import session.SessionFactory;
 
+import java.util.List;
+
 public class UserService {
     private final UserDAO userDAO = new UserDAO();
 
@@ -116,5 +118,37 @@ public class UserService {
             error.showAndWait();
             return false;
         }
+    }
+
+    public User findUserById(Long id) {
+        return userDAO.findById(id);
+    }
+
+    public User findUserByUsername(String username) {
+        return userDAO.findByUsername(username);
+    }
+
+    public List<User> findAllUsers() {
+        return userDAO.findAll();
+    }
+
+    public User insertUser(User user) {
+        return userDAO.insert(user);
+    }
+
+    public User updateUserById(Long id, User updatedUser) {
+        return userDAO.updateById(id, updatedUser);
+    }
+
+    public User updateUserByUsername(String username, User updatedUser) {
+        return userDAO.updateByUsername(username, updatedUser);
+    }
+
+    public int deleteUserById(Long id) {
+        return userDAO.deleteById(id);
+    }
+
+    public int deleteUserByUsername(String username) {
+        return userDAO.deleteByUsername(username);
     }
 }

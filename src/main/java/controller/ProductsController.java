@@ -53,12 +53,12 @@ public class ProductsController implements Initializable {
     private ProductService productService = new ProductService();
     private OrderService orderService = new OrderService();
 
-    public void onYourOrdersTextClicked() {
-
+    public void onYourOrdersTextClicked() throws IOException {
+        new SceneController(borderPane, "/view/orders-view.fxml");
     }
 
     public void onProductsTextClicked() {
-
+        // do nothing, we're already on this view
     }
 
     public void onSignOutTextClicked() throws IOException {
