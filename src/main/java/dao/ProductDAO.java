@@ -83,8 +83,7 @@ public class ProductDAO extends AbstractDAO<Product> {
         query.append("name = '").append(updatedProduct.getName()).append("', ");
         query.append("price = '").append(updatedProduct.getPrice()).append("', ");
         query.append("description = '").append(updatedProduct.getDescription()).append("', ");
-        query.append("stock = '").append(updatedProduct.getStock()).append("', ");
-        query.append("image_url = '").append(updatedProduct.getImageUrl()).append("' ");
+        query.append("stock = '").append(updatedProduct.getStock()).append("' ");
         query.append("WHERE name = '").append(name).append("';");
 
         return query.toString();
@@ -105,7 +104,6 @@ public class ProductDAO extends AbstractDAO<Product> {
         product.setName(resultSet.getString("name"));
         product.setPrice(resultSet.getDouble("price"));
         product.setDescription(resultSet.getString("description"));
-        product.setImageUrl(resultSet.getString("image_url"));
         product.setStock(resultSet.getInt("stock"));
 
         return product;

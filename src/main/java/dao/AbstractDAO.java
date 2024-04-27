@@ -160,33 +160,37 @@ public class AbstractDAO<T> {
         Field[] fields = entityClass.getDeclaredFields();
 
         for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].getName().equals(entityId) && !fields[i].getName().equals("createdAt")) {
-                query.append(FieldMapper.mapFieldNameToColumnName(fields[i].getName()));
+            if (fields[i].getName().equals(entityId)) {
+                continue;
+            }
 
-                if (i < fields.length - 1) {
-                    query.append(", ");
-                }
+            query.append(FieldMapper.mapFieldNameToColumnName(fields[i].getName()));
+
+            if (i < fields.length - 1) {
+                query.append(", ");
             }
         }
 
         query.append(") VALUES (");
 
         for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].getName().equals(entityId) && !fields[i].getName().equals("createdAt")) {
-                fields[i].setAccessible(true);
+            if (fields[i].getName().equals(entityId)) {
+                continue;
+            }
 
-                try {
-                    query.append("'").append(fields[i].get(entity)).append("'");
-                }
+            fields[i].setAccessible(true);
 
-                catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+            try {
+                query.append("'").append(fields[i].get(entity)).append("'");
+            }
 
-                if (i < fields.length - 1) {
-                    query.append(", ");
-                }
+            catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            if (i < fields.length - 1) {
+                query.append(", ");
             }
         }
 
@@ -206,24 +210,26 @@ public class AbstractDAO<T> {
         Field[] fields = entityClass.getDeclaredFields();
 
         for (int i = 0; i < fields.length; i++) {
-            if (!fields[i].getName().equals(entityId) && !fields[i].getName().equals("createdAt")) {
-                fields[i].setAccessible(true);
+            if (fields[i].getName().equals(entityId)) {
+                continue;
+            }
 
-                query.append(FieldMapper.mapFieldNameToColumnName(fields[i].getName()));
-                query.append(" = '");
+            fields[i].setAccessible(true);
 
-                try {
-                    query.append(fields[i].get(updatedEntity)).append("'");
-                }
+            query.append(FieldMapper.mapFieldNameToColumnName(fields[i].getName()));
+            query.append(" = '");
 
-                catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+            try {
+                query.append(fields[i].get(updatedEntity)).append("'");
+            }
 
-                if (i < fields.length - 1) {
-                    query.append(", ");
-                }
+            catch (IllegalAccessException e) {
+                e.printStackTrace();
+                return null;
+            }
+
+            if (i < fields.length - 1) {
+                query.append(", ");
             }
         }
 

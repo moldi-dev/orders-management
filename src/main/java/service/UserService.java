@@ -1,19 +1,19 @@
 package service;
 
-import dao.ClientDAO;
+import dao.UserDAO;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
-import model.Client;
+import model.User;
 import session.SessionFactory;
 
-public class ClientService {
-    private final ClientDAO clientDAO = new ClientDAO();
+public class UserService {
+    private final UserDAO userDAO = new UserDAO();
 
-    public ClientService() {
+    public UserService() {
 
     }
 
-    public void signInClient(String username, String password) {
+    public boolean signInUser(String username, String password) {
         Alert ok = new Alert(Alert.AlertType.CONFIRMATION);
         Alert error = new Alert(Alert.AlertType.ERROR);
         ButtonType okButtonType = new ButtonType("OK");
@@ -23,21 +23,19 @@ public class ClientService {
             error.setContentText("Please enter your credentials!");
             error.getButtonTypes().setAll(okButtonType);
             error.showAndWait();
-            return;
+            return false;
         }
 
-        Client foundClient = clientDAO.findByUsername(username);
+        User foundUser = userDAO.findByUsername(username);
 
-        if (foundClient != null && foundClient.getPassword().equals(password)) {
+        if (foundUser != null && foundUser.getPassword().equals(password)) {
             ok.setTitle("Orders management application");
             ok.setContentText("You have successfully signed in!");
             ok.getButtonTypes().setAll(okButtonType);
             ok.showAndWait();
 
-            SessionFactory.setSignedInClient(foundClient);
-
-            // TODO: redirect the client to the products page
-            // new SceneController(borderPane, "/view/products-view.fxml", 1280, 720);
+            SessionFactory.setSignedInUser(foundUser);
+            return true;
         }
 
         else {
@@ -45,10 +43,11 @@ public class ClientService {
             error.setContentText("Invalid credentials provided!");
             error.getButtonTypes().setAll(okButtonType);
             error.showAndWait();
+            return false;
         }
     }
 
-    public void signUpClient(String username, String password, String firstName, String lastName, String email, String phoneNumber, String address, String confirmPassword) {
+    public boolean signUpUser(String username, String password, String firstName, String lastName, String email, String phoneNumber, String address, String confirmPassword) {
         Alert ok = new Alert(Alert.AlertType.CONFIRMATION);
         Alert error = new Alert(Alert.AlertType.ERROR);
         ButtonType okButtonType = new ButtonType("OK");
@@ -68,27 +67,27 @@ public class ClientService {
         {
             error.setContentText("Please enter all the details!");
             error.showAndWait();
-            return;
+            return false;
         }
 
         else if (!email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
             error.setContentText("The email address must be of form 'example@email.com'");
             error.showAndWait();
-            return;
+            return false;
         }
 
         else if (!password.equals(confirmPassword)) {
             error.setContentText("Passwords do not match!");
             error.showAndWait();
-            return;
+            return false;
         }
 
-        Client foundClient = clientDAO.findByUsername(username);
+        User foundUser = userDAO.findByUsername(username);
 
-        if (foundClient != null) {
+        if (foundUser != null) {
             error.setContentText("This username is already taken!");
             error.showAndWait();
-            return;
+            return false;
         }
 
         if (username.length() > 100 ||
@@ -100,15 +99,22 @@ public class ClientService {
             address.length() > 100) {
             error.setContentText("The credentials provided can have at most 100 characters!");
             error.showAndWait();
-            return;
+            return false;
         }
 
-        Client clientToInsert = new Client(username, firstName, lastName, email, password, phoneNumber, address);
-        Client insertedClient = clientDAO.insert(clientToInsert);
+        User userToInsert = new User(username, firstName, lastName, email, password, phoneNumber, address, "CUSTOMER");
+        User insertedUser = userDAO.insert(userToInsert);
 
-        if (insertedClient != null) {
+        if (insertedUser != null) {
             ok.setContentText("You have successfuly registered! You can now sign in.");
             ok.showAndWait();
+            return true;
+        }
+
+        else {
+            error.setContentText("An error has occured, please try again later!");
+            error.showAndWait();
+            return false;
         }
     }
 }

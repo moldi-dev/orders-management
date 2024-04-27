@@ -1,19 +1,19 @@
 package session;
 
-import model.Client;
+import model.User;
 
 public class SessionFactory {
-    public static Client SIGNED_IN_CLIENT;
+    private static User signedInUser;
 
     public SessionFactory() {
 
     }
 
-    public static Client getSignedInClient() {
-        return SIGNED_IN_CLIENT;
+    public static User getSignedInUser() {
+        return signedInUser;
     }
 
-    public static void setSignedInClient(Client client) {
-        SIGNED_IN_CLIENT = client;
+    public static void setSignedInUser(User user) {
+        signedInUser = user;
     }
 }

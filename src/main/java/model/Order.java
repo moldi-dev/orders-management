@@ -4,7 +4,7 @@ import java.sql.Timestamp;
 
 public class Order {
     private Long orderId;
-    private Long clientId;
+    private Long userId;
     private Long productId;
     private Integer quantity;
     private Double totalPrice;
@@ -14,17 +14,17 @@ public class Order {
 
     }
 
-    public Order(Long clientId, Long productId, Integer quantity, Double totalPrice, Timestamp createdAt) {
-        this.clientId = clientId;
+    public Order(Long userId, Long productId, Integer quantity, Double totalPrice, Timestamp createdAt) {
+        this.userId = userId;
         this.productId = productId;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.createdAt = createdAt;
     }
 
-    public Order(Long orderId, Long clientId, Long productId, Integer quantity, Double totalPrice, Timestamp createdAt) {
+    public Order(Long orderId, Long userId, Long productId, Integer quantity, Double totalPrice, Timestamp createdAt) {
         this.orderId = orderId;
-        this.clientId = clientId;
+        this.userId = userId;
         this.productId = productId;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
@@ -35,7 +35,7 @@ public class Order {
     public String toString() {
         return "Order = {" +
                 "orderId=" + orderId +
-                ", clientId=" + clientId +
+                ", userId=" + userId +
                 ", productId=" + productId +
                 ", quantity=" + quantity +
                 ", totalPrice=" + totalPrice +
@@ -47,8 +47,8 @@ public class Order {
         return orderId;
     }
 
-    public Long getClientId() {
-        return clientId;
+    public Long getUserId() {
+        return userId;
     }
 
     public Long getProductId() {
@@ -71,8 +71,8 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setProductId(Long productId) {

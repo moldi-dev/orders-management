@@ -1,7 +1,7 @@
 package model;
 
-public class Client {
-    private Long clientId;
+public class User {
+    private Long userId;
     private String username;
     private String firstName;
     private String lastName;
@@ -9,12 +9,13 @@ public class Client {
     private String password;
     private String phoneNumber;
     private String address;
+    private String role;
 
-    public Client() {
+    public User() {
 
     }
 
-    public Client(String username, String firstName, String lastName, String email, String password, String phoneNumber, String address) {
+    public User(String username, String firstName, String lastName, String email, String password, String phoneNumber, String address, String role) {
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -22,10 +23,11 @@ public class Client {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.role = role;
     }
 
-    public Client(Long clientId, String username, String firstName, String lastName, String email, String password, String phoneNumber, String address) {
-        this.clientId = clientId;
+    public User(Long userId, String username, String firstName, String lastName, String email, String password, String phoneNumber, String address, String role) {
+        this.userId = userId;
         this.username = username;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -33,12 +35,13 @@ public class Client {
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.role = role;
     }
 
     @Override
     public String toString() {
-        return "Client = {" +
-                "clientId=" + clientId +
+        return "User = {" +
+                "userId=" + userId +
                 ", username='" + username + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
@@ -46,11 +49,12 @@ public class Client {
                 ", password='" + password + '\'' +
                 ", phoneNumber='" + phoneNumber + '\'' +
                 ", address='" + address + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 
-    public Long getClientId() {
-        return clientId;
+    public Long getUserId() {
+        return userId;
     }
 
     public String getUsername() {
@@ -81,8 +85,12 @@ public class Client {
         return address;
     }
 
-    public void setClientId(Long clientId) {
-        this.clientId = clientId;
+    public String getRole() {
+        return role;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public void setUsername(String username) {
@@ -111,5 +119,9 @@ public class Client {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

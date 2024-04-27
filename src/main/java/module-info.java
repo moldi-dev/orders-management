@@ -15,6 +15,7 @@ module com.moldidev.main {
     requires java.desktop;
 
     opens controller to javafx.fxml;
+    opens model to javafx.base;
 
     exports main;
     exports controller;

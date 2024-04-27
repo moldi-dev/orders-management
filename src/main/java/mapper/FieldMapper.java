@@ -7,7 +7,7 @@ public class FieldMapper {
     private static final Map<String, String> fieldToColumnMap = new HashMap<>();
 
     static {
-        fieldToColumnMap.put("clientId", "client_id");
+        fieldToColumnMap.put("userId", "user_id");
         fieldToColumnMap.put("firstName", "first_name");
         fieldToColumnMap.put("lastName", "last_name");
         fieldToColumnMap.put("phoneNumber", "phone_number");

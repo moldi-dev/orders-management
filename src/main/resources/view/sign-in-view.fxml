@@ -10,12 +10,12 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SignInController">
+<BorderPane fx:id="borderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/21.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SignInController">
    <left>
-      <AnchorPane prefHeight="200.0" prefWidth="350.0" style="-fx-background-color: #0598ff;" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="720.0" prefWidth="618.0" style="-fx-background-color: #0598ff;" BorderPane.alignment="CENTER">
          <children>
-            <FontAwesomeIconView fill="WHITE" glyphName="BUILDING" layoutX="132.0" layoutY="235.0" size="100" />
-            <Text fill="WHITE" layoutX="61.0" layoutY="318.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Orders management">
+            <FontAwesomeIconView fill="WHITE" glyphName="BUILDING" layoutX="229.0" layoutY="304.0" size="100" />
+            <Text fill="WHITE" layoutX="158.0" layoutY="387.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Orders management">
                <font>
                   <Font size="23.0" />
                </font>
@@ -24,16 +24,16 @@
       </AnchorPane>
    </left>
    <right>
-      <AnchorPane prefHeight="200.0" prefWidth="350.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="720.0" prefWidth="938.0" BorderPane.alignment="CENTER">
          <children>
-            <TextField fx:id="usernameTextField" layoutX="101.0" layoutY="191.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px;" />
-            <PasswordField fx:id="passwordTextField" layoutX="101.0" layoutY="257.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px;" />
-            <FontAwesomeIconView fill="#0598ff" glyphName="USER" layoutX="72.0" layoutY="213.0" size="20" />
-            <FontAwesomeIconView fill="#0598ff" glyphName="KEY" layoutX="69.0" layoutY="279.0" size="20" />
-            <Button fx:id="signInButton" layoutX="76.0" layoutY="327.0" mnemonicParsing="false" onAction="#onSignInButtonClicked" prefHeight="29.0" prefWidth="202.0" style="-fx-background-color: #0598ff;" text="Sign in" textFill="WHITE" />
-            <Hyperlink fx:id="signUpHyperlink" layoutX="70.0" layoutY="423.0" onAction="#onSignUpHyperlinkClicked" text="Don't have an account? Sign up" />
-            <FontAwesomeIconView fill="#0598ff" glyphName="USERS" layoutX="154.0" layoutY="95.0" size="30" />
-            <Text fill="#0598ff" layoutX="114.0" layoutY="134.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User sign in">
+            <TextField fx:id="usernameTextField" layoutX="241.0" layoutY="216.0" promptText="Username" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px;" />
+            <PasswordField fx:id="passwordTextField" layoutX="241.0" layoutY="282.0" promptText="Password" style="-fx-background-color: transparent; -fx-border-color: #0598ff; -fx-border-width: 0px 0px 2px 0px;" />
+            <FontAwesomeIconView fill="#0598ff" glyphName="USER" layoutX="193.0" layoutY="246.0" size="20" />
+            <FontAwesomeIconView fill="#0598ff" glyphName="KEY" layoutX="190.0" layoutY="312.0" size="20" />
+            <Button fx:id="signInButton" layoutX="218.0" layoutY="352.0" mnemonicParsing="false" onAction="#onSignInButtonClicked" prefHeight="29.0" prefWidth="202.0" style="-fx-background-color: #0598ff;" text="Sign in" textFill="WHITE" />
+            <Hyperlink fx:id="signUpHyperlink" layoutX="210.0" layoutY="448.0" onAction="#onSignUpHyperlinkClicked" text="Don't have an account? Sign up" />
+            <FontAwesomeIconView fill="#0598ff" glyphName="USERS" layoutX="294.0" layoutY="120.0" size="30" />
+            <Text fill="#0598ff" layoutX="254.0" layoutY="159.0" strokeType="OUTSIDE" strokeWidth="0.0" text="User sign in">
                <font>
                   <Font size="19.0" />
                </font>

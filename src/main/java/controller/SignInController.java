@@ -3,7 +3,7 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import service.ClientService;
+import service.UserService;
 
 import java.io.IOException;
 
@@ -24,19 +24,22 @@ public class SignInController {
     @FXML
     private BorderPane borderPane;
 
-    private ClientService clientService = new ClientService();
+    private UserService userService = new UserService();
 
     public SignInController() {
 
     }
 
-    public void onSignInButtonClicked() {
+    public void onSignInButtonClicked() throws IOException {
         String username = usernameTextField.getText();
         String password = passwordTextField.getText();
-        clientService.signInClient(username, password);
+
+        if (userService.signInUser(username, password)) {
+            new SceneController(borderPane, "/view/products-view.fxml");
+        }
     }
 
     public void onSignUpHyperlinkClicked() throws IOException {
-        new SceneController(borderPane, "/view/sign-up-view.fxml", 720, 500);
+        new SceneController(borderPane, "/view/sign-up-view.fxml");
     }
 }
