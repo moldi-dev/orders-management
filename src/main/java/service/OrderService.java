@@ -4,7 +4,6 @@ import dao.OrderDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.Order;
-import model.Product;
 
 import java.util.List;
 
@@ -37,6 +36,14 @@ public class OrderService {
 
     public int deleteOrderById(Long orderId) {
         return orderDAO.deleteById(orderId);
+    }
+
+    public int deleteOrdersWithProductId(Long productId) {
+        return orderDAO.deleteOrdersWithProductId(productId);
+    }
+
+    public int deleteOrdersWithProductName(String productName) {
+        return orderDAO.deleteOrdersWithProductName(productName);
     }
 
     public ObservableList<Order> convertOrderListToObservableList(List<Order> orderList) {

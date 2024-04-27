@@ -1,5 +1,6 @@
 package service;
 
+import dao.OrderDAO;
 import dao.ProductDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +10,7 @@ import java.util.List;
 
 public class ProductService {
     private ProductDAO productDAO = new ProductDAO();
+    private OrderDAO orderDAO = new OrderDAO();
 
     public ProductService() {
 
@@ -40,10 +42,12 @@ public class ProductService {
     }
 
     public int deleteProductById(Long productId) {
+        orderDAO.deleteOrdersWithProductId(productId);
         return productDAO.deleteById(productId);
     }
 
     public int deleteProductByName(String productName) {
+        orderDAO.deleteOrdersWithProductName(productName);
         return productDAO.deleteByName(productName);
     }
 

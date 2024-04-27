@@ -37,10 +37,56 @@ public class OrderDAO extends AbstractDAO<Order> {
         return null;
     }
 
+    public int deleteOrdersWithProductId(Long productId) {
+        String query = createDeleteOrdersWithProductIdQuery(productId);
+        System.out.println(query);
+
+        try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(query)) {
+            return preparedStatement.executeUpdate();
+        }
+
+        catch (SQLException e) {
+            LOGGER.severe("Error occurred while deleting orders with product id: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
+    public int deleteOrdersWithProductName(String productName) {
+        String query = createDeleteOrdersWithProductNameQuery(productName);
+        System.out.println(query);
+
+        try (PreparedStatement preparedStatement = ConnectionFactory.getConnection().prepareStatement(query)) {
+            return preparedStatement.executeUpdate();
+        }
+
+        catch (SQLException e) {
+            LOGGER.severe("Error occurred while deleting orders with product name: " + e.getMessage());
+        }
+
+        return 0;
+    }
+
     private String createFindOrdersByUserIdQuery(Long userId) {
         StringBuilder query = new StringBuilder();
 
         query.append("SELECT * FROM orders WHERE user_id = ").append(userId).append(";");
+
+        return query.toString();
+    }
+
+    private String createDeleteOrdersWithProductIdQuery(Long productId) {
+        StringBuilder query = new StringBuilder();
+
+        query.append("DELETE FROM orders WHERE product_id IN (SELECT product_id FROM products WHERE product_id = ").append(productId).append(");");
+
+        return query.toString();
+    }
+
+    private String createDeleteOrdersWithProductNameQuery(String productName) {
+        StringBuilder query = new StringBuilder();
+
+        query.append("DELETE FROM orders WHERE product_id IN (SELECT product_id FROM products WHERE products.name = '").append(productName).append("');");
 
         return query.toString();
     }

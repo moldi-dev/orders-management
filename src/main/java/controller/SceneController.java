@@ -2,7 +2,6 @@ package controller;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.layout.BorderPane;
-import javafx.stage.Stage;
 import main.Application;
 
 import java.io.IOException;
