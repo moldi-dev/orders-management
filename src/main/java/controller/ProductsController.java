@@ -23,24 +23,6 @@ public class ProductsController implements Initializable {
     private TableView tableView;
 
     @FXML
-    private TableColumn idColumn;
-
-    @FXML
-    private TableColumn nameColumn;
-
-    @FXML
-    private TableColumn descriptionColumn;
-
-    @FXML
-    private TableColumn priceColumn;
-
-    @FXML
-    private TableColumn stockColumn;
-
-    @FXML
-    private TableColumn actionColumn;
-
-    @FXML
     private BorderPane borderPane;
 
     private ProductService productService = new ProductService();
@@ -76,15 +58,6 @@ public class ProductsController implements Initializable {
             adminPanelText.setDisable(false);
         }
 
-        idColumn.setCellValueFactory(new PropertyValueFactory<Product, Long>("productId"));
-        nameColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
-        descriptionColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("description"));
-        priceColumn.setCellValueFactory(new PropertyValueFactory<Product, Double>("price"));
-        stockColumn.setCellValueFactory(new PropertyValueFactory<Product, Double>("stock"));
-        actionColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
-
-        productService.initializeActionColumnInProductsTableForProductsView(actionColumn, tableView);
-
-        tableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
+        tableView = productService.initializeProductsTableThroughReflectionForProductsView(tableView);
     }
 }

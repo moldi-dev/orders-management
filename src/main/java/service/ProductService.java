@@ -205,7 +205,7 @@ public class ProductService {
         });
     }
 
-    public void initializeActionColumnInProductsTableForProductsView(TableColumn actionColumn, TableView tableView) {
+    public void initializeActionColumnInProductsTableForProductsViewThroughReflection(TableColumn actionColumn, TableView tableView) {
         actionColumn.setCellFactory(_ -> new TableCell<Product, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -223,18 +223,39 @@ public class ProductService {
                         Stage stage = new Stage();
                         stage.setTitle("Order product '" + selectedProduct.getName() + "'");
 
-                        Text nameText = new Text("Product name: " + selectedProduct.getName());
-                        Text descriptionText = new Text("Description: " + selectedProduct.getDescription());
-                        Text priceText = new Text("Price: " + selectedProduct.getPrice());
-                        Text stockText = new Text("Available stock: " + selectedProduct.getStock());
+                        Field[] productFields = Product.class.getDeclaredFields();
+                        Object[] productFieldsValues = new Object[productFields.length];
+                        String[] texts = new String[productFields.length];
+
+                        for (int i = 0; i < productFields.length; i++) {
+                            productFields[i].setAccessible(true);
+
+                            texts[i] = productFields[i].getName().toUpperCase();
+
+                            try {
+                                productFieldsValues[i] = productFields[i].get(selectedProduct);
+                                texts[i] = texts[i] + ": " + productFieldsValues[i];
+                            }
+
+                            catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+                        }
 
                         Spinner<Integer> spinner = new Spinner<>(1, selectedProduct.getStock(), 1);
 
                         Button placeOrderButton = new Button("PLACE ORDER");
                         placeOrderButton.setOnAction(_ -> {
-                            int quantity = spinner.getValue();
-                            Order order = new Order(SessionFactory.getSignedInUser().getUserId(), selectedProduct.getProductId(), quantity, selectedProduct.getPrice() * quantity, new Timestamp(System.currentTimeMillis()));
-                            Order insertedOrder = orderDAO.insert(order);
+                            Integer quantity = spinner.getValue();
+
+                            Order orderToInsert = new Order(SessionFactory.getSignedInUser().getUserId(),
+                                    selectedProduct.getProductId(),
+                                    quantity,
+                                    selectedProduct.getPrice() * quantity,
+                                    new Timestamp(System.currentTimeMillis()));
+
+                            Order insertedOrder = orderDAO.insert(orderToInsert);
 
                             if (insertedOrder != null) {
                                 selectedProduct.setStock(selectedProduct.getStock() - quantity);
@@ -263,11 +284,22 @@ public class ProductService {
                             }
                         });
 
-                        VBox vbox = new VBox(10, nameText, descriptionText, priceText, stockText, new Label("Select the quantity:"), spinner, placeOrderButton);
-                        vbox.setAlignment(Pos.CENTER);
+                        VBox vBox = new VBox(10);
 
-                        stage.setScene(new Scene(vbox, 400, 400));
-                        stage.setResizable(false);
+                        for (String text : texts) {
+                            vBox.getChildren().add(new Label(text));
+                        }
+
+                        vBox.getChildren().add(spinner);
+
+                        vBox.getChildren().add(placeOrderButton);
+
+                        vBox.setAlignment(Pos.CENTER);
+
+                        stage.setScene(new Scene(vBox, 400, 400));
+                        stage.setResizable(true);
+                        stage.setMinWidth(400);
+                        stage.setMinHeight(400);
                         stage.show();
                     });
 
@@ -488,6 +520,29 @@ public class ProductService {
                 }
             }
         });
+    }
+
+    public TableView initializeProductsTableThroughReflectionForProductsView(TableView tableView) {
+        Field[] fields = Product.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            TableColumn column = new TableColumn(field.getName());
+            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
+            tableView.getColumns().add(column);
+        }
+
+        TableColumn actionColumn = new TableColumn("action");
+        actionColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
+
+        initializeActionColumnInProductsTableForProductsViewThroughReflection(actionColumn, tableView);
+
+        tableView.getColumns().add(actionColumn);
+
+        tableView.setItems(convertProductListToObservableList(findAllProducts()));
+
+        return tableView;
     }
 
     public TableView initializeProductsTableThroughReflectionForAdminControlPanel(TableView productTableView) {

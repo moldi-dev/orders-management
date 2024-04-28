@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -35,15 +34,6 @@
       </AnchorPane>
    </top>
    <center>
-      <TableView fx:id="tableView" prefHeight="645.0" prefWidth="1167.0" BorderPane.alignment="CENTER">
-        <columns>
-          <TableColumn fx:id="idColumn" prefWidth="102.0" text="ID" />
-          <TableColumn fx:id="nameColumn" prefWidth="285.0" text="NAME" />
-            <TableColumn fx:id="descriptionColumn" prefWidth="282.0" text="DESCRIPTION" />
-            <TableColumn fx:id="priceColumn" prefWidth="134.0" text="PRICE" />
-            <TableColumn fx:id="stockColumn" prefWidth="195.0" text="STOCK" />
-            <TableColumn fx:id="actionColumn" prefWidth="293.0" text="ACTION" />
-        </columns>
-      </TableView>
+      <TableView fx:id="tableView" prefHeight="645.0" prefWidth="1167.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>
