@@ -91,77 +91,7 @@ public class ProductsController implements Initializable {
         stockColumn.setCellValueFactory(new PropertyValueFactory<Product, Double>("stock"));
         actionColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
 
-        actionColumn.setCellFactory(_ -> new TableCell<Product, String>() {
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (item == null || empty || getTableView().getItems().get(getIndex()).getStock() <= 0) {
-                    setGraphic(null);
-                }
-
-                else {
-                    Button orderButton = new Button("ORDER");
-                    orderButton.setOnAction(_ -> {
-                        Product selectedProduct = getTableView().getItems().get(getIndex());
-
-                        Stage stage = new Stage();
-                        stage.setTitle("Order product '" + selectedProduct.getName() + "'");
-
-                        Text nameText = new Text("Product name: " + selectedProduct.getName());
-                        Text descriptionText = new Text("Description: " + selectedProduct.getDescription());
-                        Text priceText = new Text("Price: " + selectedProduct.getPrice());
-                        Text stockText = new Text("Available stock: " + selectedProduct.getStock());
-
-                        Spinner<Integer> spinner = new Spinner<>(1, selectedProduct.getStock(), 1);
-
-                        Button placeOrderButton = new Button("PLACE ORDER");
-                        placeOrderButton.setOnAction(_ -> {
-                            int quantity = spinner.getValue();
-                            Order order = new Order(SessionFactory.getSignedInUser().getUserId(), selectedProduct.getProductId(), quantity, selectedProduct.getPrice() * quantity, new Timestamp(System.currentTimeMillis()));
-                            Order insertedOrder = orderService.insertOrder(order);
-
-                            if (insertedOrder != null) {
-                                selectedProduct.setStock(selectedProduct.getStock() - quantity);
-
-                                if (selectedProduct.getStock() <= 0) {
-                                    setGraphic(null);
-                                }
-
-                                productService.updateProductById(selectedProduct.getProductId(), selectedProduct);
-                                tableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
-
-                                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-
-                                alert.setTitle("Orders management");
-                                alert.setHeaderText("You have successfully placed a new order!");
-                                alert.showAndWait();
-                                stage.close();
-                            }
-
-                            else {
-                                Alert alert = new Alert(Alert.AlertType.ERROR);
-                                alert.setTitle("Orders management");
-                                alert.setHeaderText("An error occured! Please try again later!");
-                                alert.showAndWait();
-                                stage.close();
-                            }
-                        });
-
-                        VBox vbox = new VBox(10, nameText, descriptionText, priceText, stockText, new Label("Select the quantity:"), spinner, placeOrderButton);
-                        vbox.setAlignment(Pos.CENTER);
-
-                        stage.setScene(new Scene(vbox, 400, 400));
-                        stage.setResizable(false);
-                        stage.show();
-                    });
-
-                    HBox hBox = new HBox(orderButton);
-                    hBox.setAlignment(Pos.CENTER);
-                    setGraphic(hBox);
-                }
-            }
-        });
+        productService.initializeActionColumnInProductsTableForProductsView(actionColumn, tableView);
 
         tableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
     }

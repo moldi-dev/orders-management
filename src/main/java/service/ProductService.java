@@ -11,9 +11,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import model.Order;
 import model.Product;
+import session.SessionFactory;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,6 +70,171 @@ public class ProductService {
         return observableList;
     }
 
+    public void initializeAddProductButtonLogicForAdminControlPanel(Button addProductButton, TableView productTableView) {
+        addProductButton.setOnAction(_ -> {
+            Stage stage = new Stage();
+            stage.setTitle("Add a new product");
+
+            Label[] labels = {
+                    new Label("Name: "),
+                    new Label("Description: "),
+                    new Label("Price: "),
+                    new Label("Stock: ")
+            };
+
+            TextField[] textFields = {
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+            };
+
+            GridPane gridPane = new GridPane();
+            gridPane.setHgap(10);
+            gridPane.setVgap(10);
+            gridPane.setPadding(new Insets(20, 20, 20, 20));
+
+            for (int i = 0; i < labels.length; i++) {
+                gridPane.add(labels[i], 0, i);
+                gridPane.add(textFields[i], 1, i);
+            }
+
+            Button insertProductButton = new Button("Add a new product");
+
+            insertProductButton.setOnAction(_ -> {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Orders management");
+
+                for (int i = 0; i < labels.length; i++) {
+                    if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
+                        errorAlert.setHeaderText("All the details must be filled in!");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+                }
+
+                if (!textFields[2].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[2].getText()) <= 0) {
+                    errorAlert.setHeaderText("The price must be a positive real number!");
+                    errorAlert.showAndWait();
+                    return;
+                }
+
+                else if (!textFields[3].getText().matches("[0-9]+") || Integer.parseInt(textFields[3].getText()) < 0) {
+                    errorAlert.setHeaderText("The stock must be an integer greater than or equal to 0!");
+                    errorAlert.showAndWait();
+                    return;
+                }
+
+                String productName = textFields[0].getText();
+                String productDescription = textFields[1].getText();
+                Double productPrice = Double.parseDouble(textFields[2].getText());
+                Integer stock = Integer.parseInt(textFields[3].getText());
+
+                Product productToInsert = new Product(productName, productDescription, productPrice, stock);
+                Product insertedProduct = insertProduct(productToInsert);
+
+                if (insertedProduct != null) {
+                    Alert successAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    successAlert.setHeaderText("The product has been successfully added!");
+                    successAlert.showAndWait();
+                    stage.close();
+
+                    productTableView.setItems(convertProductListToObservableList(findAllProducts()));
+                }
+
+                else {
+                    errorAlert.setHeaderText("An error has occured! Please try again later!");
+                    errorAlert.showAndWait();
+                    stage.close();
+                }
+            });
+
+            gridPane.add(insertProductButton, 1, labels.length);
+
+            BorderPane borderPane = new BorderPane();
+            borderPane.setCenter(gridPane);
+
+            Scene scene = new Scene(borderPane, 350, 200);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.show();
+        });
+    }
+
+    public void initializeActionColumnInProductsTableForProductsView(TableColumn actionColumn, TableView tableView) {
+        actionColumn.setCellFactory(_ -> new TableCell<Product, String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (item == null || empty || getTableView().getItems().get(getIndex()).getStock() <= 0) {
+                    setGraphic(null);
+                }
+
+                else {
+                    Button orderButton = new Button("ORDER");
+                    orderButton.setOnAction(_ -> {
+                        Product selectedProduct = getTableView().getItems().get(getIndex());
+
+                        Stage stage = new Stage();
+                        stage.setTitle("Order product '" + selectedProduct.getName() + "'");
+
+                        Text nameText = new Text("Product name: " + selectedProduct.getName());
+                        Text descriptionText = new Text("Description: " + selectedProduct.getDescription());
+                        Text priceText = new Text("Price: " + selectedProduct.getPrice());
+                        Text stockText = new Text("Available stock: " + selectedProduct.getStock());
+
+                        Spinner<Integer> spinner = new Spinner<>(1, selectedProduct.getStock(), 1);
+
+                        Button placeOrderButton = new Button("PLACE ORDER");
+                        placeOrderButton.setOnAction(_ -> {
+                            int quantity = spinner.getValue();
+                            Order order = new Order(SessionFactory.getSignedInUser().getUserId(), selectedProduct.getProductId(), quantity, selectedProduct.getPrice() * quantity, new Timestamp(System.currentTimeMillis()));
+                            Order insertedOrder = orderDAO.insert(order);
+
+                            if (insertedOrder != null) {
+                                selectedProduct.setStock(selectedProduct.getStock() - quantity);
+
+                                if (selectedProduct.getStock() <= 0) {
+                                    setGraphic(null);
+                                }
+
+                                updateProductById(selectedProduct.getProductId(), selectedProduct);
+                                tableView.setItems(convertProductListToObservableList(findAllProducts()));
+
+                                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+
+                                alert.setTitle("Orders management");
+                                alert.setHeaderText("You have successfully placed a new order!");
+                                alert.showAndWait();
+                                stage.close();
+                            }
+
+                            else {
+                                Alert alert = new Alert(Alert.AlertType.ERROR);
+                                alert.setTitle("Orders management");
+                                alert.setHeaderText("An error occured! Please try again later!");
+                                alert.showAndWait();
+                                stage.close();
+                            }
+                        });
+
+                        VBox vbox = new VBox(10, nameText, descriptionText, priceText, stockText, new Label("Select the quantity:"), spinner, placeOrderButton);
+                        vbox.setAlignment(Pos.CENTER);
+
+                        stage.setScene(new Scene(vbox, 400, 400));
+                        stage.setResizable(false);
+                        stage.show();
+                    });
+
+                    HBox hBox = new HBox(orderButton);
+                    hBox.setAlignment(Pos.CENTER);
+                    setGraphic(hBox);
+                }
+            }
+        });
+    }
+
     public void initializeActionColumnInProductTableForAdminControlPanel(TableColumn actionColumnProductTable, TableView productTableView) {
         actionColumnProductTable.setCellFactory(_ -> new TableCell<Product, String>() {
             @Override
@@ -72,107 +242,7 @@ public class ProductService {
                 super.updateItem(item, empty);
 
                 if ((item == null || empty)) {
-                    if (getIndex() == getTableView().getItems().size()) {
-                        Button addProductButton = new Button("ADD PRODUCT");
-
-                        addProductButton.setOnAction(_ -> {
-                            Stage stage = new Stage();
-                            stage.setTitle("Add a new product");
-
-                            Label[] labels = {
-                                    new Label("Name: "),
-                                    new Label("Description: "),
-                                    new Label("Price: "),
-                                    new Label("Stock: ")
-                            };
-
-                            TextField[] textFields = {
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                            };
-
-                            GridPane gridPane = new GridPane();
-                            gridPane.setHgap(10);
-                            gridPane.setVgap(10);
-                            gridPane.setPadding(new Insets(20, 20, 20, 20));
-
-                            for (int i = 0; i < labels.length; i++) {
-                                gridPane.add(labels[i], 0, i);
-                                gridPane.add(textFields[i], 1, i);
-                            }
-
-                            Button insertProductButton = new Button("Add a new product");
-
-                            insertProductButton.setOnAction(_ -> {
-                                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                                errorAlert.setTitle("Orders management");
-
-                                for (int i = 0; i < labels.length; i++) {
-                                    if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
-                                        errorAlert.setHeaderText("All the details must be filled in!");
-                                        errorAlert.showAndWait();
-                                        return;
-                                    }
-                                }
-
-                                if (!textFields[2].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[2].getText()) <= 0) {
-                                    errorAlert.setHeaderText("The price must be a positive real number!");
-                                    errorAlert.showAndWait();
-                                    return;
-                                }
-
-                                else if (!textFields[3].getText().matches("[0-9]+") || Integer.parseInt(textFields[3].getText()) < 0) {
-                                    errorAlert.setHeaderText("The stock must be an integer greater than or equal to 0!");
-                                    errorAlert.showAndWait();
-                                    return;
-                                }
-
-                                String productName = textFields[0].getText();
-                                String productDescription = textFields[1].getText();
-                                Double productPrice = Double.parseDouble(textFields[2].getText());
-                                Integer stock = Integer.parseInt(textFields[3].getText());
-
-                                Product productToInsert = new Product(productName, productDescription, productPrice, stock);
-                                Product insertedProduct = insertProduct(productToInsert);
-
-                                if (insertedProduct != null) {
-                                    Alert successAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                                    successAlert.setHeaderText("The product has been successfully added!");
-                                    successAlert.showAndWait();
-                                    stage.close();
-
-                                    productTableView.setItems(convertProductListToObservableList(findAllProducts()));
-                                }
-
-                                else {
-                                    errorAlert.setHeaderText("An error has occured! Please try again later!");
-                                    errorAlert.showAndWait();
-                                    stage.close();
-                                }
-                            });
-
-                            gridPane.add(insertProductButton, 1, labels.length);
-
-                            BorderPane borderPane = new BorderPane();
-                            borderPane.setCenter(gridPane);
-
-                            Scene scene = new Scene(borderPane, 350, 200);
-                            stage.setScene(scene);
-                            stage.setResizable(false);
-                            stage.show();
-                        });
-
-                        HBox hBox = new HBox(addProductButton);
-                        hBox.setAlignment(Pos.CENTER);
-
-                        setGraphic(hBox);
-                    }
-
-                    else {
-                        setGraphic(null);
-                    }
+                    setGraphic(null);
                 }
 
                 else {

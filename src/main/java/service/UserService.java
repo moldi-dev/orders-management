@@ -167,6 +167,108 @@ public class UserService {
         return observableList;
     }
 
+    public void initializeAddUserButtonLogicForAdminControlPanel(Button addUserButton, TableView userTableView) {
+        addUserButton.setOnAction(_ -> {
+            Stage stage = new Stage();
+            stage.setTitle("Add a new user");
+
+            Label[] labels = {
+                    new Label("Username: "),
+                    new Label("First name: "),
+                    new Label("Last name: "),
+                    new Label("Email: "),
+                    new Label("Password: "),
+                    new Label("Phone number: "),
+                    new Label("Address: "),
+                    new Label("Role: ")
+            };
+
+            TextField[] textFields = {
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+                    new TextField(),
+            };
+
+            GridPane gridPane = new GridPane();
+            gridPane.setHgap(10);
+            gridPane.setVgap(10);
+            gridPane.setPadding(new Insets(20, 20, 20, 20));
+
+            for (int i = 0; i < labels.length; i++) {
+                gridPane.add(labels[i], 0, i);
+                gridPane.add(textFields[i], 1, i);
+            }
+
+            Button insertUserButton = new Button("Add a new user");
+
+            insertUserButton.setOnAction(_ -> {
+                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                errorAlert.setTitle("Orders management");
+
+                for (int i = 0; i < labels.length; i++) {
+                    if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
+                        errorAlert.setHeaderText("All the details must be filled in!");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+
+                    else if (textFields[i].getText().length() > 100) {
+                        errorAlert.setHeaderText("The fields must contain at most 100 characters!");
+                        errorAlert.showAndWait();
+                        return;
+                    }
+                }
+
+                if (!textFields[3].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                    errorAlert.setHeaderText("The email address must be of form 'example@email.com'");
+                    errorAlert.showAndWait();
+                    return;
+                }
+
+                User userToInsert = new User(textFields[0].getText(),
+                        textFields[1].getText(),
+                        textFields[2].getText(),
+                        textFields[3].getText(),
+                        textFields[4].getText(),
+                        textFields[5].getText(),
+                        textFields[6].getText(),
+                        textFields[7].getText());
+
+                User insertedUser = insertUser(userToInsert);
+
+                if (insertedUser != null) {
+                    Alert successAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                    successAlert.setHeaderText("The user has been successfully added!");
+                    successAlert.showAndWait();
+                    stage.close();
+
+                    userTableView.setItems(convertUserListToObservableList(findAllUsers()));
+                }
+
+                else {
+                    errorAlert.setHeaderText("An error has occured! Please try again later!");
+                    errorAlert.showAndWait();
+                    stage.close();
+                }
+            });
+
+            gridPane.add(insertUserButton, 1, labels.length);
+
+            BorderPane borderPane = new BorderPane();
+            borderPane.setCenter(gridPane);
+
+            Scene scene = new Scene(borderPane, 350, 325);
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.show();
+        });
+    }
+
     public void initializeActionColumnInUserTableForAdminControlPanel(TableColumn actionColumnUserTable, TableView userTableView) {
         actionColumnUserTable.setCellFactory(_ -> new TableCell<User, String>() {
             @Override
@@ -174,118 +276,7 @@ public class UserService {
                 super.updateItem(item, empty);
 
                 if (item == null || empty) {
-                    if (getIndex() == getTableView().getItems().size()) {
-                        Button addUserButton = new Button("ADD USER");
-
-                        addUserButton.setOnAction(_ -> {
-                            Stage stage = new Stage();
-                            stage.setTitle("Add a new user");
-
-                            Label[] labels = {
-                                    new Label("Username: "),
-                                    new Label("First name: "),
-                                    new Label("Last name: "),
-                                    new Label("Email: "),
-                                    new Label("Password: "),
-                                    new Label("Phone number: "),
-                                    new Label("Address: "),
-                                    new Label("Role: ")
-                            };
-
-                            TextField[] textFields = {
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                                    new TextField(),
-                            };
-
-                            GridPane gridPane = new GridPane();
-                            gridPane.setHgap(10);
-                            gridPane.setVgap(10);
-                            gridPane.setPadding(new Insets(20, 20, 20, 20));
-
-                            for (int i = 0; i < labels.length; i++) {
-                                gridPane.add(labels[i], 0, i);
-                                gridPane.add(textFields[i], 1, i);
-                            }
-
-                            Button insertUserButton = new Button("Add a new user");
-
-                            insertUserButton.setOnAction(_ -> {
-                                Alert errorAlert = new Alert(Alert.AlertType.ERROR);
-                                errorAlert.setTitle("Orders management");
-
-                                for (int i = 0; i < labels.length; i++) {
-                                    if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
-                                        errorAlert.setHeaderText("All the details must be filled in!");
-                                        errorAlert.showAndWait();
-                                        return;
-                                    }
-
-                                    else if (textFields[i].getText().length() > 100) {
-                                        errorAlert.setHeaderText("The fields must contain at most 100 characters!");
-                                        errorAlert.showAndWait();
-                                        return;
-                                    }
-                                }
-
-                                if (!textFields[3].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-                                    errorAlert.setHeaderText("The email address must be of form 'example@email.com'");
-                                    errorAlert.showAndWait();
-                                    return;
-                                }
-
-                                User userToInsert = new User(textFields[0].getText(),
-                                        textFields[1].getText(),
-                                        textFields[2].getText(),
-                                        textFields[3].getText(),
-                                        textFields[4].getText(),
-                                        textFields[5].getText(),
-                                        textFields[6].getText(),
-                                        textFields[7].getText());
-
-                                User insertedUser = insertUser(userToInsert);
-
-                                if (insertedUser != null) {
-                                    Alert successAlert = new Alert(Alert.AlertType.CONFIRMATION);
-                                    successAlert.setHeaderText("The user has been successfully added!");
-                                    successAlert.showAndWait();
-                                    stage.close();
-
-                                    userTableView.setItems(convertUserListToObservableList(findAllUsers()));
-                                }
-
-                                else {
-                                    errorAlert.setHeaderText("An error has occured! Please try again later!");
-                                    errorAlert.showAndWait();
-                                    stage.close();
-                                }
-                            });
-
-                            gridPane.add(insertUserButton, 1, labels.length);
-
-                            BorderPane borderPane = new BorderPane();
-                            borderPane.setCenter(gridPane);
-
-                            Scene scene = new Scene(borderPane, 350, 325);
-                            stage.setScene(scene);
-                            stage.setResizable(false);
-                            stage.show();
-                        });
-
-                        HBox hBox = new HBox(addUserButton);
-                        hBox.setAlignment(Pos.CENTER);
-
-                        setGraphic(hBox);
-                    }
-
-                    else {
-                        setGraphic(null);
-                    }
+                    setGraphic(null);
                 }
 
                 else {

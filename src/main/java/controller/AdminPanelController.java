@@ -2,6 +2,7 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -20,6 +21,12 @@ import java.sql.Timestamp;
 import java.util.ResourceBundle;
 
 public class AdminPanelController implements Initializable {
+
+    @FXML
+    private Button addUserButton;
+
+    @FXML
+    private Button addProductButton;
 
     @FXML
     private TableColumn userIdColumnUserTable;
@@ -134,6 +141,7 @@ public class AdminPanelController implements Initializable {
         roleColumnUserTable.setCellValueFactory(new PropertyValueFactory<User, String>("role"));
         actionColumnUserTable.setCellValueFactory(new PropertyValueFactory<User, String>("username"));
 
+        userService.initializeAddUserButtonLogicForAdminControlPanel(addUserButton, userTableView);
         userService.initializeActionColumnInUserTableForAdminControlPanel(actionColumnUserTable, userTableView);
 
         userTableView.setItems(userService.convertUserListToObservableList(userService.findAllUsers()));
@@ -145,6 +153,7 @@ public class AdminPanelController implements Initializable {
         productStockColumnProductTable.setCellValueFactory(new PropertyValueFactory<Product, Integer>("stock"));
         actionColumnProductTable.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
 
+        productService.initializeAddProductButtonLogicForAdminControlPanel(addProductButton, productTableView);
         productService.initializeActionColumnInProductTableForAdminControlPanel(actionColumnProductTable, productTableView);
 
         productTableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
