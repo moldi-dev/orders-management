@@ -60,7 +60,7 @@
                         <TableColumn fx:id="productDescriptionColumnProductTable" prefWidth="259.0" text="DESCRIPTION" />
                         <TableColumn fx:id="productPriceColumnProductTable" prefWidth="227.0" text="PRICE" />
                         <TableColumn fx:id="productStockColumnProductTable" minWidth="0.0" prefWidth="145.0" text="STOCK" />
-                        <TableColumn fx:id="productActionColumnProductTable" prefWidth="222.0" text="ACTION" />
+                        <TableColumn fx:id="actionColumnProductTable" prefWidth="222.0" text="ACTION" />
                      </columns>
                   </TableView>
                   <TableView fx:id="orderTableView" layoutX="36.0" layoutY="428.0" prefHeight="191.0" prefWidth="1201.0">
