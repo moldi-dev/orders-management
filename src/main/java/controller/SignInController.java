@@ -11,7 +11,6 @@ import service.UserService;
 import java.io.IOException;
 
 public class SignInController {
-
     @FXML
     private Hyperlink signUpHyperlink;
 

@@ -1,5 +1,6 @@
 package controller;
 
+import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Hyperlink;
 import javafx.scene.control.PasswordField;
@@ -10,17 +11,38 @@ import service.UserService;
 import java.io.IOException;
 
 public class SignUpController {
-    public BorderPane borderPane;
-    public TextField usernameTextField;
-    public PasswordField passwordTextField;
-    public Button signUpButton;
-    public Hyperlink signInHyperlink;
-    public TextField firstNameTextField;
-    public TextField lastNameTextField;
-    public TextField emailTextField;
-    public TextField addressTextField;
-    public TextField phoneNumberTextField;
-    public PasswordField confirmPasswordTextField;
+    @FXML
+    private BorderPane borderPane;
+
+    @FXML
+    private TextField usernameTextField;
+
+    @FXML
+    private PasswordField passwordTextField;
+
+    @FXML
+    private Button signUpButton;
+
+    @FXML
+    private Hyperlink signInHyperlink;
+
+    @FXML
+    private TextField firstNameTextField;
+
+    @FXML
+    private TextField lastNameTextField;
+
+    @FXML
+    private TextField emailTextField;
+
+    @FXML
+    private TextField addressTextField;
+
+    @FXML
+    private TextField phoneNumberTextField;
+
+    @FXML
+    private PasswordField confirmPasswordTextField;
 
     private UserService userService = new UserService();
 

@@ -5,9 +5,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import model.Order;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 
@@ -113,5 +115,28 @@ public class OrderService {
                 }
             }
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    public TableView initializeOrdersTableThroughReflectionForAdminControlPanel(TableView orderTableView) {
+        Field[] fields = Order.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            TableColumn column = new TableColumn(field.getName());
+            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
+            orderTableView.getColumns().add(column);
+        }
+
+        TableColumn actionColumn = new TableColumn("action");
+        actionColumn.setCellValueFactory(new PropertyValueFactory<Order, Long>("orderId"));
+
+        initializeActionColumnInOrderTableForAdminControlPanel(actionColumn, orderTableView);
+
+        orderTableView.getColumns().add(actionColumn);
+        orderTableView.setItems(convertOrderListToObservableList(findAllOrders()));
+
+        return orderTableView;
     }
 }

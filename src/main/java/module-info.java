@@ -21,7 +21,6 @@ module com.moldidev.main {
     exports main;
     exports controller;
     exports connection;
-    exports reflection;
     exports dao;
     exports utility;
 }

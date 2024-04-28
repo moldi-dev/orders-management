@@ -7,6 +7,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -14,6 +15,10 @@ import javafx.stage.Stage;
 import model.User;
 import session.SessionFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -172,45 +177,43 @@ public class UserService {
             Stage stage = new Stage();
             stage.setTitle("Add a new user");
 
-            Label[] labels = {
-                    new Label("Username: "),
-                    new Label("First name: "),
-                    new Label("Last name: "),
-                    new Label("Email: "),
-                    new Label("Password: "),
-                    new Label("Phone number: "),
-                    new Label("Address: "),
-                    new Label("Role: ")
-            };
+            Field[] fields = User.class.getDeclaredFields();
+            Label[] labels = new Label[fields.length];
+            TextField[] textFields = new TextField[fields.length];
+            Constructor[] constructors = User.class.getDeclaredConstructors();
+            Constructor defaultConstructor = null;
 
-            TextField[] textFields = {
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-            };
+            for (Constructor constructor : constructors) {
+                if (constructor.getParameterCount() == 0) {
+                    defaultConstructor = constructor;
+                }
+            }
+
+            for (int i = 0; i < fields.length; i++) {
+                fields[i].setAccessible(true);
+                textFields[i] = new TextField("");
+                labels[i] = new Label(fields[i].getName().toUpperCase() + ":");
+            }
 
             GridPane gridPane = new GridPane();
             gridPane.setHgap(10);
             gridPane.setVgap(10);
             gridPane.setPadding(new Insets(20, 20, 20, 20));
 
-            for (int i = 0; i < labels.length; i++) {
+            for (int i = 1; i < labels.length; i++) {
                 gridPane.add(labels[i], 0, i);
                 gridPane.add(textFields[i], 1, i);
             }
 
             Button insertUserButton = new Button("Add a new user");
 
+            Constructor finalDefaultConstructor = defaultConstructor;
+
             insertUserButton.setOnAction(_ -> {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Orders management");
 
-                for (int i = 0; i < labels.length; i++) {
+                for (int i = 1; i < labels.length; i++) {
                     if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
                         errorAlert.setHeaderText("All the details must be filled in!");
                         errorAlert.showAndWait();
@@ -224,20 +227,38 @@ public class UserService {
                     }
                 }
 
-                if (!textFields[3].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                if (!textFields[4].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
                     errorAlert.setHeaderText("The email address must be of form 'example@email.com'");
                     errorAlert.showAndWait();
                     return;
                 }
 
-                User userToInsert = new User(textFields[0].getText(),
-                        textFields[1].getText(),
-                        textFields[2].getText(),
-                        textFields[3].getText(),
-                        textFields[4].getText(),
-                        textFields[5].getText(),
-                        textFields[6].getText(),
-                        textFields[7].getText());
+                User userToInsert;
+
+                try {
+                    finalDefaultConstructor.setAccessible(true);
+                    userToInsert = (User) finalDefaultConstructor.newInstance();
+
+                    for (int i = 1; i < fields.length; i++) {
+                        fields[i].setAccessible(true);
+                        fields[i].set(userToInsert, textFields[i].getText());
+                    }
+                }
+
+                catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                catch (InstantiationException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return;
+                }
 
                 User insertedUser = insertUser(userToInsert);
 
@@ -262,14 +283,16 @@ public class UserService {
             BorderPane borderPane = new BorderPane();
             borderPane.setCenter(gridPane);
 
-            Scene scene = new Scene(borderPane, 350, 325);
+            Scene scene = new Scene(borderPane);
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setResizable(true);
+            stage.setMinHeight(400);
+            stage.setMinWidth(350);
             stage.show();
         });
     }
 
-    public void initializeActionColumnInUserTableForAdminControlPanel(TableColumn actionColumnUserTable, TableView userTableView) {
+    public void initializeActionColumnInUserTableForAdminControlPanelThroughReflection(TableColumn actionColumnUserTable, TableView userTableView) {
         actionColumnUserTable.setCellFactory(_ -> new TableCell<User, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -289,27 +312,44 @@ public class UserService {
                         Stage stage = new Stage();
                         stage.setTitle("Edit user '" + selectedUser.getUsername() + "'");
 
-                        Label[] labels = {
-                                new Label("Username: "), new Label("First name: "), new Label("Last name: "),
-                                new Label("Email: "), new Label("Password: "), new Label("Phone number: "),
-                                new Label("Address: "), new Label("Role: ")
-                        };
+                        Field[] fields = User.class.getDeclaredFields();
+                        Label[] labels = new Label[fields.length];
+                        TextField[] textFields = new TextField[fields.length];
+                        Object[] fieldValues = new Object[fields.length];
+                        Constructor[] constructors = User.class.getDeclaredConstructors();
+                        Constructor defaultConstructor = null;
 
-                        TextField[] textFields = {
-                                new TextField(selectedUser.getUsername()), new TextField(selectedUser.getFirstName()),
-                                new TextField(selectedUser.getLastName()), new TextField(selectedUser.getEmail()),
-                                new TextField(selectedUser.getPassword()), new TextField(selectedUser.getPhoneNumber()),
-                                new TextField(selectedUser.getAddress()), new TextField(selectedUser.getRole())
-                        };
+                        for (Constructor constructor : constructors) {
+                            if (constructor.getParameterCount() == 0) {
+                                defaultConstructor = constructor;
+                            }
+                        }
+
+                        for (int i = 0; i < fields.length; i++) {
+                            fields[i].setAccessible(true);
+
+                            labels[i] = new Label(fields[i].getName().toUpperCase() + ":");
+
+                            try {
+                                fieldValues[i] = fields[i].get(selectedUser);
+                                textFields[i] = new TextField(fieldValues[i].toString());
+                            }
+
+                            catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+                        }
 
                         Button editUserButton = new Button("EDIT USER");
                         editUserButton.setMaxWidth(Double.MAX_VALUE);
 
+                        Constructor finalDefaultConstructor = defaultConstructor;
                         editUserButton.setOnAction(_ -> {
                             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                             errorAlert.setTitle("Orders management");
 
-                            for (int i = 0; i < textFields.length; i++) {
+                            for (int i = 1; i < textFields.length; i++) {
                                 if (textFields[i].getText().length() > 100) {
                                     errorAlert.setHeaderText("The fields can have at most 100 characters!");
                                     errorAlert.showAndWait();
@@ -323,20 +363,39 @@ public class UserService {
                                 }
                             }
 
-                            if (!textFields[3].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+                            if (!textFields[4].getText().matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
                                 errorAlert.setHeaderText("The email address must be of form 'example@email.com'");
                                 errorAlert.showAndWait();
                                 return;
                             }
 
-                            User editedUser = new User(textFields[0].getText(),
-                                    textFields[1].getText(),
-                                    textFields[2].getText(),
-                                    textFields[3].getText(),
-                                    textFields[4].getText(),
-                                    textFields[5].getText(),
-                                    textFields[6].getText(),
-                                    textFields[7].getText());
+                            User editedUser;
+
+                            try {
+                                finalDefaultConstructor.setAccessible(true);
+                                editedUser = (User) finalDefaultConstructor.newInstance();
+
+                                for (int i = 1; i < fields.length; i++) {
+                                    fields[i].setAccessible(true);
+
+                                    fields[i].set(editedUser, textFields[i].getText());
+                                }
+                            }
+
+                            catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            catch (InstantiationException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                                return;
+                            }
 
                             User updatedUser = updateUserById(selectedUser.getUserId(), editedUser);
 
@@ -369,7 +428,7 @@ public class UserService {
                         gridPane.setVgap(10);
                         gridPane.setPadding(new Insets(20, 20, 20, 20));
 
-                        for (int i = 0; i < labels.length; i++) {
+                        for (int i = 1; i < labels.length; i++) {
                             gridPane.add(labels[i], 0, i);
                             gridPane.add(textFields[i], 1, i);
                         }
@@ -379,9 +438,11 @@ public class UserService {
                         BorderPane borderPane = new BorderPane();
                         borderPane.setCenter(gridPane);
 
-                        Scene scene = new Scene(borderPane, 350, 325);
+                        Scene scene = new Scene(borderPane);
                         stage.setScene(scene);
-                        stage.setResizable(false);
+                        stage.setResizable(true);
+                        stage.setMinWidth(400);
+                        stage.setMinHeight(400);
                         stage.show();
                     });
 
@@ -429,5 +490,29 @@ public class UserService {
                 }
             }
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    public TableView initializeUsersTableThroughReflectionForAdminControlPanel(TableView userTableView) {
+        Field[] fields = User.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            TableColumn column = new TableColumn(field.getName());
+            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
+            userTableView.getColumns().add(column);
+        }
+
+        TableColumn actionColumn = new TableColumn("action");
+        actionColumn.setCellValueFactory(new PropertyValueFactory<User, String>("username"));
+
+        initializeActionColumnInUserTableForAdminControlPanelThroughReflection(actionColumn, userTableView);
+
+        userTableView.getColumns().add(actionColumn);
+
+        userTableView.setItems(convertUserListToObservableList(findAllUsers()));
+
+        return userTableView;
     }
 }

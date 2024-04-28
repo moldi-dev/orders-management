@@ -8,6 +8,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -18,6 +19,9 @@ import model.Order;
 import model.Product;
 import session.SessionFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
@@ -70,42 +74,48 @@ public class ProductService {
         return observableList;
     }
 
-    public void initializeAddProductButtonLogicForAdminControlPanel(Button addProductButton, TableView productTableView) {
+    public void initializeAddProductButtonLogicForAdminControlPanelThroughReflection(Button addProductButton, TableView productTableView) {
         addProductButton.setOnAction(_ -> {
             Stage stage = new Stage();
             stage.setTitle("Add a new product");
 
-            Label[] labels = {
-                    new Label("Name: "),
-                    new Label("Description: "),
-                    new Label("Price: "),
-                    new Label("Stock: ")
-            };
+            Field[] fields = Product.class.getDeclaredFields();
+            Label[] labels = new Label[fields.length];
+            TextField[] textFields = new TextField[fields.length];
+            Constructor[] constructors = Product.class.getDeclaredConstructors();
+            Constructor defaultConstructor = null;
 
-            TextField[] textFields = {
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-                    new TextField(),
-            };
+            for (Constructor constructor : constructors) {
+                if (constructor.getParameterCount() == 0) {
+                    defaultConstructor = constructor;
+                }
+            }
+
+            for (int i = 0; i < fields.length; i++) {
+                fields[i].setAccessible(true);
+                textFields[i] = new TextField("");
+                labels[i] = new Label(fields[i].getName().toUpperCase() + ":");
+            }
 
             GridPane gridPane = new GridPane();
             gridPane.setHgap(10);
             gridPane.setVgap(10);
             gridPane.setPadding(new Insets(20, 20, 20, 20));
 
-            for (int i = 0; i < labels.length; i++) {
+            for (int i = 1; i < labels.length; i++) {
                 gridPane.add(labels[i], 0, i);
                 gridPane.add(textFields[i], 1, i);
             }
 
             Button insertProductButton = new Button("Add a new product");
 
+            Constructor finalDefaultConstructor = defaultConstructor;
+
             insertProductButton.setOnAction(_ -> {
                 Alert errorAlert = new Alert(Alert.AlertType.ERROR);
                 errorAlert.setTitle("Orders management");
 
-                for (int i = 0; i < labels.length; i++) {
+                for (int i = 1; i < labels.length; i++) {
                     if (textFields[i].getText().isEmpty() || textFields[i].getText().isBlank()) {
                         errorAlert.setHeaderText("All the details must be filled in!");
                         errorAlert.showAndWait();
@@ -113,24 +123,56 @@ public class ProductService {
                     }
                 }
 
-                if (!textFields[2].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[2].getText()) <= 0) {
+                if (!textFields[3].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[3].getText()) <= 0) {
                     errorAlert.setHeaderText("The price must be a positive real number!");
                     errorAlert.showAndWait();
                     return;
                 }
 
-                else if (!textFields[3].getText().matches("[0-9]+") || Integer.parseInt(textFields[3].getText()) < 0) {
+                else if (!textFields[4].getText().matches("[0-9]+") || Integer.parseInt(textFields[4].getText()) < 0) {
                     errorAlert.setHeaderText("The stock must be an integer greater than or equal to 0!");
                     errorAlert.showAndWait();
                     return;
                 }
 
-                String productName = textFields[0].getText();
-                String productDescription = textFields[1].getText();
-                Double productPrice = Double.parseDouble(textFields[2].getText());
-                Integer stock = Integer.parseInt(textFields[3].getText());
+                Product productToInsert;
 
-                Product productToInsert = new Product(productName, productDescription, productPrice, stock);
+                try {
+                    finalDefaultConstructor.setAccessible(true);
+                    productToInsert = (Product) finalDefaultConstructor.newInstance();
+
+                    for (int i = 1; i < fields.length; i++) {
+                        fields[i].setAccessible(true);
+
+                        if (i == 3) {
+                            fields[i].set(productToInsert, Double.parseDouble(textFields[i].getText()));
+                        }
+
+                        else if (i == 4) {
+                            fields[i].set(productToInsert, Integer.parseInt(textFields[i].getText()));
+                        }
+
+                        else {
+                            fields[i].set(productToInsert, textFields[i].getText());
+                        }
+                    }
+                }
+
+                catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                catch (InstantiationException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
                 Product insertedProduct = insertProduct(productToInsert);
 
                 if (insertedProduct != null) {
@@ -154,9 +196,11 @@ public class ProductService {
             BorderPane borderPane = new BorderPane();
             borderPane.setCenter(gridPane);
 
-            Scene scene = new Scene(borderPane, 350, 200);
+            Scene scene = new Scene(borderPane);
             stage.setScene(scene);
-            stage.setResizable(false);
+            stage.setResizable(true);
+            stage.setMinWidth(350);
+            stage.setMinHeight(200);
             stage.show();
         });
     }
@@ -235,7 +279,7 @@ public class ProductService {
         });
     }
 
-    public void initializeActionColumnInProductTableForAdminControlPanel(TableColumn actionColumnProductTable, TableView productTableView) {
+    public void initializeActionColumnInProductTableForAdminControlPanelThroughReflection(TableColumn actionColumnProductTable, TableView productTableView) {
         actionColumnProductTable.setCellFactory(_ -> new TableCell<Product, String>() {
             @Override
             protected void updateItem(String item, boolean empty) {
@@ -255,18 +299,39 @@ public class ProductService {
                         Stage stage = new Stage();
                         stage.setTitle("Edit product '" + selectedProduct.getName() + "'");
 
-                        Label[] labels = {
-                                new Label("Name: "), new Label("Description: "), new Label("Price: "),
-                                new Label("Stock: ")
-                        };
+                        Field[] fields = Product.class.getDeclaredFields();
+                        Label[] labels = new Label[fields.length];
+                        TextField[] textFields = new TextField[fields.length];
+                        Object[] fieldValues = new Object[fields.length];
+                        Constructor[] constructors = Product.class.getDeclaredConstructors();
+                        Constructor defaultConstructor = null;
 
-                        TextField[] textFields = {
-                                new TextField(selectedProduct.getName()), new TextField(selectedProduct.getDescription()),
-                                new TextField(selectedProduct.getPrice().toString()), new TextField(selectedProduct.getStock().toString())
-                        };
+                        for (Constructor constructor : constructors) {
+                            if (constructor.getParameterCount() == 0) {
+                                defaultConstructor = constructor;
+                            }
+                        }
+
+                        for (int i = 0; i < fields.length; i++) {
+                            fields[i].setAccessible(true);
+
+                            labels[i] = new Label(fields[i].getName().toUpperCase() + ":");
+
+                            try {
+                                fieldValues[i] = fields[i].get(selectedProduct);
+                                textFields[i] = new TextField(fieldValues[i].toString());
+                            }
+
+                            catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+                        }
 
                         Button editProductButton = new Button("EDIT PRODUCT");
                         editProductButton.setMaxWidth(Double.MAX_VALUE);
+
+                        Constructor finalDefaultConstructor = defaultConstructor;
 
                         editProductButton.setOnAction(_ -> {
                             Alert errorAlert = new Alert(Alert.AlertType.ERROR);
@@ -280,22 +345,55 @@ public class ProductService {
                                 }
                             }
 
-                            if (!textFields[2].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[2].getText()) <= 0) {
+                            if (!textFields[3].getText().matches("[0-9]*\\.[0-9]+") || Double.parseDouble(textFields[3].getText()) <= 0) {
                                 errorAlert.setHeaderText("The price must be a positive real number!");
                                 errorAlert.showAndWait();
                                 return;
                             }
 
-                            else if (!textFields[3].getText().matches("[0-9]+") || Integer.parseInt(textFields[3].getText()) < 0) {
+                            else if (!textFields[4].getText().matches("[0-9]+") || Integer.parseInt(textFields[4].getText()) < 0) {
                                 errorAlert.setHeaderText("The stock must be a an integer greater than or equal to 0!");
                                 errorAlert.showAndWait();
                                 return;
                             }
 
-                            Product editedProduct = new Product(textFields[0].getText(),
-                                    textFields[1].getText(),
-                                    Double.parseDouble(textFields[2].getText()),
-                                    Integer.parseInt(textFields[3].getText()));
+                            Product editedProduct;
+
+                            try {
+                                finalDefaultConstructor.setAccessible(true);
+                                editedProduct = (Product) finalDefaultConstructor.newInstance();
+
+                                for (int i = 1; i < fields.length; i++) {
+                                    fields[i].setAccessible(true);
+
+                                    if (i == 3) {
+                                        fields[i].set(editedProduct, Double.parseDouble(textFields[i].getText()));
+                                    }
+
+                                    else if (i == 4) {
+                                        fields[i].set(editedProduct, Integer.parseInt(textFields[i].getText()));
+                                    }
+
+                                    else {
+                                        fields[i].set(editedProduct, textFields[i].getText());
+                                    }
+                                }
+                            }
+
+                            catch (InvocationTargetException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            catch (InstantiationException e) {
+                                e.printStackTrace();
+                                return;
+                            }
+
+                            catch (IllegalAccessException e) {
+                                e.printStackTrace();
+                                return;
+                            }
 
                             Product updatedProduct = updateProductById(selectedProduct.getProductId(), editedProduct);
 
@@ -328,7 +426,7 @@ public class ProductService {
                         gridPane.setVgap(10);
                         gridPane.setPadding(new Insets(20, 20, 20, 20));
 
-                        for (int i = 0; i < labels.length; i++) {
+                        for (int i = 1; i < labels.length; i++) {
                             gridPane.add(labels[i], 0, i);
                             gridPane.add(textFields[i], 1, i);
                         }
@@ -338,9 +436,11 @@ public class ProductService {
                         BorderPane borderPane = new BorderPane();
                         borderPane.setCenter(gridPane);
 
-                        Scene scene = new Scene(borderPane, 350, 200);
+                        Scene scene = new Scene(borderPane);
                         stage.setScene(scene);
-                        stage.setResizable(false);
+                        stage.setResizable(true);
+                        stage.setMinWidth(350);
+                        stage.setMinHeight(300);
                         stage.show();
                     });
 
@@ -388,5 +488,28 @@ public class ProductService {
                 }
             }
         });
+    }
+
+    public TableView initializeProductsTableThroughReflectionForAdminControlPanel(TableView productTableView) {
+        Field[] fields = Product.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            TableColumn column = new TableColumn(field.getName());
+            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
+            productTableView.getColumns().add(column);
+        }
+
+        TableColumn actionColumn = new TableColumn("action");
+        actionColumn.setCellValueFactory(new PropertyValueFactory<Product, String>("name"));
+
+        initializeActionColumnInProductTableForAdminControlPanelThroughReflection(actionColumn, productTableView);
+
+        productTableView.getColumns().add(actionColumn);
+
+        productTableView.setItems(convertProductListToObservableList(findAllProducts()));
+
+        return productTableView;
     }
 }

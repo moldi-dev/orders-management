@@ -2,24 +2,17 @@ package controller;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Pos;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import javafx.stage.Stage;
-import model.Order;
 import model.Product;
-import service.OrderService;
 import service.ProductService;
 import session.SessionFactory;
 
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Timestamp;
 import java.util.ResourceBundle;
 
 public class ProductsController implements Initializable {
@@ -51,7 +44,6 @@ public class ProductsController implements Initializable {
     private BorderPane borderPane;
 
     private ProductService productService = new ProductService();
-    private OrderService orderService = new OrderService();
 
     public void onYourOrdersTextClicked() throws IOException {
         new SceneController(borderPane, "/view/orders-view.fxml");
