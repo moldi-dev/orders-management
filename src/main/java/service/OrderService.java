@@ -1,6 +1,7 @@
 package service;
 
 import dao.OrderDAO;
+import dao.ProductDAO;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
@@ -8,13 +9,22 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import model.Order;
+import model.Product;
+import session.SessionFactory;
+import utility.OrderDetail;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.RecordComponent;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
+    private final ProductDAO productDAO = new ProductDAO();
 
     public OrderService() {
 
@@ -136,6 +146,31 @@ public class OrderService {
 
         orderTableView.getColumns().add(actionColumn);
         orderTableView.setItems(convertOrderListToObservableList(findAllOrders()));
+
+        return orderTableView;
+    }
+
+    @SuppressWarnings("unchecked")
+    public TableView initializeOrdersTableThroughReflectionForOrdersView(TableView orderTableView) {
+        ObservableList<Order> userOrders = convertOrderListToObservableList(findOrdersByUserId(SessionFactory.getSignedInUser().getUserId()));
+        ObservableList<OrderDetail> userOrderDetails = FXCollections.observableArrayList();
+
+        for (Order order : userOrders) {
+            Product product = productDAO.findById(order.getProductId());
+            userOrderDetails.add(new OrderDetail(order.getOrderId(), product.getName(), product.getDescription(), product.getPrice(), order.getQuantity(), order.getTotalPrice(), order.getCreatedAt()));
+        }
+
+        Field[] fields = OrderDetail.class.getDeclaredFields();
+
+        for (Field field : fields) {
+            field.setAccessible(true);
+
+            TableColumn column = new TableColumn(field.getName());
+            column.setCellValueFactory(new PropertyValueFactory<>(field.getName()));
+            orderTableView.getColumns().add(column);
+        }
+
+        orderTableView.setItems(userOrderDetails);
 
         return orderTableView;
     }
