@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
@@ -32,4 +35,48 @@
          </children>
       </AnchorPane>
    </top>
+   <center>
+      <ScrollPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+        <content>
+          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="650.0" prefWidth="1280.0">
+               <children>
+                  <TableView fx:id="userTableView" layoutX="36.0" layoutY="32.0" prefHeight="188.0" prefWidth="1201.0">
+                    <columns>
+                      <TableColumn fx:id="userIdColumnUserTable" prefWidth="75.0" text="USER ID" />
+                      <TableColumn fx:id="usernameColumnUserTable" prefWidth="149.0" text="USERNAME" />
+                        <TableColumn fx:id="firstNameColumnUserTable" prefWidth="113.0" text="FIRST NAME" />
+                        <TableColumn fx:id="lastNameColumnUserTable" prefWidth="112.0" text="LAST NAME" />
+                        <TableColumn fx:id="emailColumnUserTable" minWidth="0.0" prefWidth="125.0" text="EMAIL" />
+                        <TableColumn fx:id="phoneNumberColumnUserTable" prefWidth="132.0" text="PHONE NUMBER" />
+                        <TableColumn fx:id="addressColumnUserTable" prefWidth="179.0" text="ADDRESS" />
+                        <TableColumn fx:id="roleColumnUserTable" prefWidth="153.0" text="ROLE" />
+                        <TableColumn fx:id="actionColumnUserTable" prefWidth="161.0" text="ACTION" />
+                    </columns>
+                  </TableView>
+                  <TableView fx:id="productTableView" layoutX="36.0" layoutY="226.0" prefHeight="192.0" prefWidth="1200.0">
+                     <columns>
+                        <TableColumn fx:id="productIdColumnProductTable" prefWidth="102.0" text="PRODUCT ID" />
+                        <TableColumn fx:id="productNameColumnProductTable" prefWidth="243.0" text="NAME" />
+                        <TableColumn fx:id="productDescriptionColumnProductTable" prefWidth="259.0" text="DESCRIPTION" />
+                        <TableColumn fx:id="productPriceColumnProductTable" prefWidth="227.0" text="PRICE" />
+                        <TableColumn fx:id="productStockColumnProductTable" minWidth="0.0" prefWidth="145.0" text="STOCK" />
+                        <TableColumn fx:id="productActionColumnProductTable" prefWidth="222.0" text="ACTION" />
+                     </columns>
+                  </TableView>
+                  <TableView fx:id="orderTableView" layoutX="36.0" layoutY="428.0" prefHeight="191.0" prefWidth="1201.0">
+                     <columns>
+                        <TableColumn fx:id="orderIdColumnOrderTable" prefWidth="102.0" text="ORDER ID" />
+                        <TableColumn fx:id="userIdColumnOrderTable" prefWidth="123.0" text="USER ID" />
+                        <TableColumn fx:id="productIdColumnOrderTable" prefWidth="196.0" text="PRODUCT ID" />
+                        <TableColumn fx:id="quantityColumnOrderTable" prefWidth="139.0" text="QUANTITY" />
+                        <TableColumn fx:id="totalPriceColumnOrderTable" minWidth="0.0" prefWidth="157.0" text="TOTAL PRICE" />
+                        <TableColumn fx:id="createdAtColumnOrderTable" prefWidth="204.0" text="CREATED AT" />
+                        <TableColumn fx:id="actionColumnOrderTable" prefWidth="278.0" text="ACTION" />
+                     </columns>
+                  </TableView>
+               </children>
+            </AnchorPane>
+        </content>
+      </ScrollPane>
+   </center>
 </BorderPane>

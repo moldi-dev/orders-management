@@ -1,6 +1,8 @@
 package service;
 
 import dao.UserDAO;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
 import model.User;
@@ -22,7 +24,7 @@ public class UserService {
 
         if (username.isEmpty() || password.isEmpty() || username.isBlank() || password.isBlank()) {
             error.setTitle("Orders management application");
-            error.setContentText("Please enter your credentials!");
+            error.setHeaderText("Please enter your credentials!");
             error.getButtonTypes().setAll(okButtonType);
             error.showAndWait();
             return false;
@@ -32,7 +34,7 @@ public class UserService {
 
         if (foundUser != null && foundUser.getPassword().equals(password)) {
             ok.setTitle("Orders management application");
-            ok.setContentText("You have successfully signed in!");
+            ok.setHeaderText("You have successfully signed in!");
             ok.getButtonTypes().setAll(okButtonType);
             ok.showAndWait();
 
@@ -42,7 +44,7 @@ public class UserService {
 
         else {
             error.setTitle("Orders management application");
-            error.setContentText("Invalid credentials provided!");
+            error.setHeaderText("Invalid credentials provided!");
             error.getButtonTypes().setAll(okButtonType);
             error.showAndWait();
             return false;
@@ -67,19 +69,19 @@ public class UserService {
             address.isEmpty() || address.isBlank() ||
             confirmPassword.isEmpty() || confirmPassword.isBlank())
         {
-            error.setContentText("Please enter all the details!");
+            error.setHeaderText("Please enter all the details!");
             error.showAndWait();
             return false;
         }
 
         else if (!email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            error.setContentText("The email address must be of form 'example@email.com'");
+            error.setHeaderText("The email address must be of form 'example@email.com'");
             error.showAndWait();
             return false;
         }
 
         else if (!password.equals(confirmPassword)) {
-            error.setContentText("Passwords do not match!");
+            error.setHeaderText("Passwords do not match!");
             error.showAndWait();
             return false;
         }
@@ -87,7 +89,7 @@ public class UserService {
         User foundUser = userDAO.findByUsername(username);
 
         if (foundUser != null) {
-            error.setContentText("This username is already taken!");
+            error.setHeaderText("This username is already taken!");
             error.showAndWait();
             return false;
         }
@@ -99,7 +101,7 @@ public class UserService {
             email.length() > 100 ||
             phoneNumber.length() > 100 ||
             address.length() > 100) {
-            error.setContentText("The credentials provided can have at most 100 characters!");
+            error.setHeaderText("The credentials provided can have at most 100 characters!");
             error.showAndWait();
             return false;
         }
@@ -108,13 +110,13 @@ public class UserService {
         User insertedUser = userDAO.insert(userToInsert);
 
         if (insertedUser != null) {
-            ok.setContentText("You have successfuly registered! You can now sign in.");
+            ok.setHeaderText("You have successfuly registered! You can now sign in.");
             ok.showAndWait();
             return true;
         }
 
         else {
-            error.setContentText("An error has occured, please try again later!");
+            error.setHeaderText("An error has occured, please try again later!");
             error.showAndWait();
             return false;
         }
@@ -150,5 +152,11 @@ public class UserService {
 
     public int deleteUserByUsername(String username) {
         return userDAO.deleteByUsername(username);
+    }
+
+    public ObservableList<User> convertUserListToObservableList(List<User> userList) {
+        ObservableList<User> observableList = FXCollections.observableArrayList();
+        observableList.addAll(userList);
+        return observableList;
     }
 }

@@ -13,7 +13,6 @@ public class FieldMapper {
         fieldToColumnMap.put("phoneNumber", "phone_number");
 
         fieldToColumnMap.put("productId", "product_id");
-        fieldToColumnMap.put("imageUrl", "image_url");
         fieldToColumnMap.put("createdAt", "created_at");
 
         fieldToColumnMap.put("orderId", "order_id");

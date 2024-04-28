@@ -4,7 +4,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.User;
-import service.ProductService;
 import session.SessionFactory;
 
 import java.io.IOException;
@@ -20,8 +19,6 @@ public class Application extends javafx.application.Application {
         stage.setTitle("Orders management application");
         stage.setScene(scene);
         stage.show();
-
-        new ProductService().deleteProductById(9L);
     }
 
     public static void main(String[] args) {

@@ -66,8 +66,8 @@ public class OrdersController implements Initializable {
         new SceneController(borderPane, "/view/sign-in-view.fxml");
     }
 
-    public void onAdminPanelTextClicked() {
-
+    public void onAdminPanelTextClicked() throws IOException {
+        new SceneController(borderPane, "/view/admin-panel-view.fxml");
     }
 
     @Override

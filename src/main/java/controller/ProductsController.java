@@ -67,11 +67,8 @@ public class ProductsController implements Initializable {
         new SceneController(borderPane, "/view/sign-in-view.fxml");
     }
 
-    public void onAdminPanelTextClicked() {
-        if (SessionFactory.getSignedInUser() != null && SessionFactory.getSignedInUser().getRole().equals("ADMINISTRATOR")) {
-            // TODO: redirect to the admin panel view
-            System.out.println("REDIRECTED TO THE ADMIN PANEL");
-        }
+    public void onAdminPanelTextClicked() throws IOException {
+        new SceneController(borderPane, "/view/admin-panel-view.fxml");
     }
 
     @Override
@@ -109,7 +106,7 @@ public class ProductsController implements Initializable {
                         Product selectedProduct = getTableView().getItems().get(getIndex());
 
                         Stage stage = new Stage();
-                        stage.setTitle("Orders management");
+                        stage.setTitle("Order product '" + selectedProduct.getName() + "'");
 
                         Text nameText = new Text("Product name: " + selectedProduct.getName());
                         Text descriptionText = new Text("Description: " + selectedProduct.getDescription());
@@ -132,12 +129,12 @@ public class ProductsController implements Initializable {
                                 }
 
                                 productService.updateProductById(selectedProduct.getProductId(), selectedProduct);
-                                tableView.setItems(productService.convertProductListToObservableList(productService.getAllProducts()));
+                                tableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
 
                                 Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
                                 alert.setTitle("Orders management");
-                                alert.setContentText("You have successfully placed a new order!");
+                                alert.setHeaderText("You have successfully placed a new order!");
                                 alert.showAndWait();
                                 stage.close();
                             }
@@ -145,8 +142,9 @@ public class ProductsController implements Initializable {
                             else {
                                 Alert alert = new Alert(Alert.AlertType.ERROR);
                                 alert.setTitle("Orders management");
-                                alert.setContentText("An error occured! Please try again later!");
+                                alert.setHeaderText("An error occured! Please try again later!");
                                 alert.showAndWait();
+                                stage.close();
                             }
                         });
 
@@ -165,6 +163,6 @@ public class ProductsController implements Initializable {
             }
         });
 
-        tableView.setItems(productService.convertProductListToObservableList(productService.getAllProducts()));
+        tableView.setItems(productService.convertProductListToObservableList(productService.findAllProducts()));
     }
 }
