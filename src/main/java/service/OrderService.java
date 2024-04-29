@@ -1,5 +1,6 @@
 package service;
 
+import dao.BillDAO;
 import dao.OrderDAO;
 import dao.ProductDAO;
 import javafx.collections.FXCollections;
@@ -8,23 +9,22 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
+import model.Bill;
 import model.Order;
 import model.Product;
+import model.User;
 import session.SessionFactory;
 import utility.OrderDetail;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.RecordComponent;
-import java.util.Arrays;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class OrderService {
     private final OrderDAO orderDAO = new OrderDAO();
     private final ProductDAO productDAO = new ProductDAO();
+    private final BillDAO billDAO = new BillDAO();
 
     public OrderService() {
 
@@ -43,7 +43,22 @@ public class OrderService {
     }
 
     public Order insertOrder(Order order) {
-        return orderDAO.insert(order);
+        Order insertedOrder = orderDAO.insert(order);
+        Product foundProduct = productDAO.findById(insertedOrder.getProductId());
+        User signedInUser = SessionFactory.getSignedInUser();
+
+        billDAO.insertBill(new Bill(insertedOrder.getOrderId(),
+                foundProduct.getName(),
+                insertedOrder.getQuantity(),
+                insertedOrder.getTotalPrice(),
+                signedInUser.getUsername(),
+                signedInUser.getFirstName(),
+                signedInUser.getLastName(),
+                signedInUser.getAddress(),
+                signedInUser.getPhoneNumber(),
+                new Timestamp(System.currentTimeMillis())));
+
+       return insertedOrder;
     }
 
     public Order updateOrderById(Long orderId, Order orderToUpdate) {
@@ -51,6 +66,7 @@ public class OrderService {
     }
 
     public int deleteOrderById(Long orderId) {
+        billDAO.deleteById(orderId);
         return orderDAO.deleteById(orderId);
     }
 
@@ -80,6 +96,7 @@ public class OrderService {
 
                 else {
                     Button deleteButton = new Button("DELETE");
+                    deleteButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
 
                     deleteButton.setOnAction(_ -> {
                         Order selectedOrder = getTableView().getItems().get(getIndex());

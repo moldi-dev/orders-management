@@ -18,7 +18,6 @@ import session.SessionFactory;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -173,6 +172,8 @@ public class UserService {
     }
 
     public void initializeAddUserButtonLogicForAdminControlPanel(Button addUserButton, TableView userTableView) {
+        addUserButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
         addUserButton.setOnAction(_ -> {
             Stage stage = new Stage();
             stage.setTitle("Add a new user");
@@ -206,6 +207,7 @@ public class UserService {
             }
 
             Button insertUserButton = new Button("Add a new user");
+            insertUserButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
 
             Constructor finalDefaultConstructor = defaultConstructor;
 
@@ -306,6 +308,9 @@ public class UserService {
                     Button editButton = new Button("EDIT");
                     Button deleteButton = new Button("DELETE");
 
+                    editButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+                    deleteButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
                     editButton.setOnAction(_ -> {
                         User selectedUser = getTableView().getItems().get(getIndex());
 
@@ -342,6 +347,7 @@ public class UserService {
                         }
 
                         Button editUserButton = new Button("EDIT USER");
+                        editUserButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
                         editUserButton.setMaxWidth(Double.MAX_VALUE);
 
                         Constructor finalDefaultConstructor = defaultConstructor;

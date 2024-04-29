@@ -13,7 +13,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import model.Order;
 import model.Product;
@@ -29,6 +28,7 @@ import java.util.Optional;
 public class ProductService {
     private ProductDAO productDAO = new ProductDAO();
     private OrderDAO orderDAO = new OrderDAO();
+    private OrderService orderService = new OrderService();
 
     public ProductService() {
 
@@ -75,6 +75,8 @@ public class ProductService {
     }
 
     public void initializeAddProductButtonLogicForAdminControlPanelThroughReflection(Button addProductButton, TableView productTableView) {
+        addProductButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
         addProductButton.setOnAction(_ -> {
             Stage stage = new Stage();
             stage.setTitle("Add a new product");
@@ -108,6 +110,7 @@ public class ProductService {
             }
 
             Button insertProductButton = new Button("Add a new product");
+            insertProductButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
 
             Constructor finalDefaultConstructor = defaultConstructor;
 
@@ -217,6 +220,8 @@ public class ProductService {
 
                 else {
                     Button orderButton = new Button("ORDER");
+                    orderButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
                     orderButton.setOnAction(_ -> {
                         Product selectedProduct = getTableView().getItems().get(getIndex());
 
@@ -246,6 +251,8 @@ public class ProductService {
                         Spinner<Integer> spinner = new Spinner<>(1, selectedProduct.getStock(), 1);
 
                         Button placeOrderButton = new Button("PLACE ORDER");
+                        placeOrderButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
                         placeOrderButton.setOnAction(_ -> {
                             Integer quantity = spinner.getValue();
 
@@ -255,7 +262,7 @@ public class ProductService {
                                     selectedProduct.getPrice() * quantity,
                                     new Timestamp(System.currentTimeMillis()));
 
-                            Order insertedOrder = orderDAO.insert(orderToInsert);
+                            Order insertedOrder = orderService.insertOrder(orderToInsert);
 
                             if (insertedOrder != null) {
                                 selectedProduct.setStock(selectedProduct.getStock() - quantity);
@@ -325,6 +332,9 @@ public class ProductService {
                     Button editButton = new Button("EDIT");
                     Button deleteButton = new Button("DELETE");
 
+                    editButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+                    deleteButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
+
                     editButton.setOnAction(_ -> {
                         Product selectedProduct = getTableView().getItems().get(getIndex());
 
@@ -361,6 +371,7 @@ public class ProductService {
                         }
 
                         Button editProductButton = new Button("EDIT PRODUCT");
+                        editProductButton.setStyle("-fx-background-color: #0598ff; -fx-text-fill: white;");
                         editProductButton.setMaxWidth(Double.MAX_VALUE);
 
                         Constructor finalDefaultConstructor = defaultConstructor;
